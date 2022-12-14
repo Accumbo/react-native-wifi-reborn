@@ -18,6 +18,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiNetworkSpecifier;
+import android.net.wifi.WifiNetworkSuggestion;
 import android.os.Build;
 import android.provider.Settings;
 
@@ -46,6 +47,7 @@ import com.thanosfisherman.wifiutils.wifiDisconnect.DisconnectionSuccessListener
 import com.thanosfisherman.wifiutils.wifiRemove.RemoveErrorCode;
 import com.thanosfisherman.wifiutils.wifiRemove.RemoveSuccessListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RNWifiModule extends ReactContextBaseJavaModule {
@@ -226,10 +228,23 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
             return;
         }
 
+        final WifiNetworkSuggestion suggestion =
+                new WifiNetworkSuggestion.Builder()
+                        .setSsid(SSID)
+                        .setWpa2Passphrase(password)
+                        .setIsAppInteractionRequired(true) // Optional (Needs location permission)
+                        .build();
 
-        this.removeWifiNetwork(SSID, promise, () -> {
-            connectToWifiDirectly(SSID, password, promise);
-        });
+        final List<WifiNetworkSuggestion> suggestionsList =
+                new ArrayList<>();
+
+        suggestionsList.add(suggestion);
+
+        final WifiManager wifiManager =
+                (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        final int status = wifiManager.addNetworkSuggestions(suggestionsList);
+
     }
 
 
