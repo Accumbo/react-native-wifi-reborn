@@ -281,7 +281,7 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
     };
 
     IntentFilter intentFilter = new IntentFilter(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
-    applicationContext.registerReceiver(broadcastReceiver, intentFilter);
+    context.getApplicationContext().registerReceiver(broadcastReceiver, intentFilter);
 
     }
 
