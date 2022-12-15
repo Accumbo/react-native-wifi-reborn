@@ -196,7 +196,9 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void setEnabled(final boolean enabled) {
-        wifi.setWifiEnabled(enabled);
+      context.startActivity(new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK));
+
+        // wifi.setWifiEnabled(enabled);
     }
 
     /**
@@ -228,22 +230,57 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        final WifiNetworkSuggestion suggestion =
-                new WifiNetworkSuggestion.Builder()
-                        .setSsid(SSID)
-                        .setWpa2Passphrase(password)
-                        .setIsAppInteractionRequired(true) // Optional (Needs location permission)
-                        .build();
+        // final WifiNetworkSuggestion suggestion =
+        //         new WifiNetworkSuggestion.Builder()
+        //                 .setSsid(SSID)
+        //                 .setWpa2Passphrase(password)
+        //                 .setIsAppInteractionRequired(true) // Optional (Needs location permission)
+        //                 .build();
 
-        final List<WifiNetworkSuggestion> suggestionsList =
-                new ArrayList<>();
+        // final List<WifiNetworkSuggestion> suggestionsList =
+        //         new ArrayList<>();
 
-        suggestionsList.add(suggestion);
+        // suggestionsList.add(suggestion);
 
-        final WifiManager wifiManager =
-                (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        // final WifiManager wifiManager =
+        //         (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        final int status = wifiManager.addNetworkSuggestions(suggestionsList);
+        // final int status = wifiManager.addNetworkSuggestions(suggestionsList);
+            WifiManager wifiManager = (WifiManager) applicationContext.getSystemService(Context.WIFI_SERVICE);
+            List<WifiNetworkSuggestion> wifiNetworkSuggestionMutableList = wifiManager.getNetworkSuggestions();
+            int status = wifiManager.removeNetworkSuggestions(wifiNetworkSuggestionMutableList);
+            if (status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS) {
+                promise.reject(ConnectErrorCodes.couldNotEnableWifi.toString(), "Could not remove network suggestion");
+            }
+
+            WifiNetworkSuggestion suggestion = new WifiNetworkSuggestion.Builder()
+                    .setSsid(ssidName)
+                    .setWpa2Passphrase(password)
+                    .setIsAppInteractionRequired(true)
+                    .build();
+            
+            List<WifiNetworkSuggestion> suggestions = new ArrayList<>();
+            suggestions.add(suggestion);
+
+            status = wifiManager.addNetworkSuggestions(suggestions);
+            if (status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS) {
+                promise.reject(ConnectErrorCodes.couldNotEnableWifi.toString(), "Could not give network suggestion");
+                return;
+            }
+
+            BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (!intent.getAction().equals(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION)) {
+                        return
+                    }
+
+                    promise.resolve();
+                }
+    };
+
+    IntentFilter intentFilter = new IntentFilter(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
+    applicationContext.registerReceiver(broadcastReceiver, intentFilter);
 
     }
 
