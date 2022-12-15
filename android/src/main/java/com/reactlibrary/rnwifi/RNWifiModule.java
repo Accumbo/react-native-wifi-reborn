@@ -197,7 +197,10 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void setEnabled(final boolean enabled) {
-      context.startActivity(new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK));
+        Intent intent = new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        context.startActivity(intent);
 
         // wifi.setWifiEnabled(enabled);
     }
