@@ -247,7 +247,7 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
         //         (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         // final int status = wifiManager.addNetworkSuggestions(suggestionsList);
-            WifiManager wifiManager = (WifiManager) applicationContext.getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             List<WifiNetworkSuggestion> wifiNetworkSuggestionMutableList = wifiManager.getNetworkSuggestions();
             int status = wifiManager.removeNetworkSuggestions(wifiNetworkSuggestionMutableList);
             if (status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS) {
@@ -255,7 +255,7 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
             }
 
             WifiNetworkSuggestion suggestion = new WifiNetworkSuggestion.Builder()
-                    .setSsid(ssidName)
+                    .setSsid(SSID)
                     .setWpa2Passphrase(password)
                     .setIsAppInteractionRequired(true)
                     .build();
@@ -276,7 +276,7 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
                         return;
                     }
 
-                    promise.resolve();
+                    promise.resolve(true);
                 }
     };
 
