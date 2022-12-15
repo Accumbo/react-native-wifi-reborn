@@ -3,6 +3,7 @@ package com.reactlibrary.rnwifi;
 import static com.reactlibrary.rnwifi.mappers.WifiScanResultsMapper.mapWifiScanResults;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -272,7 +273,7 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     if (!intent.getAction().equals(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION)) {
-                        return
+                        return;
                     }
 
                     promise.resolve();
